@@ -125,6 +125,8 @@ module Paperclip
             config[opt] = azure_credentials[opt] if azure_credentials[opt]
           end
 
+          config[:region] = azure_credentials[:region] || :global
+
           obtain_azure_instance_for(config.merge(@azure_options))
         end
       end
@@ -137,7 +139,9 @@ module Paperclip
           service = ::Azure::Storage::Blob::BlobService.create(use_development_storage: true)
         else
           service = ::Azure::Storage::Blob::BlobService.create(storage_account_name: options[:storage_account_name],
-                                                               storage_access_key: options[:storage_access_key])
+                                                               storage_access_key: options[:storage_access_key],
+                                                               storage_dns_suffix: Environment::ENVIRONMENT_SUFFIX[options[:region]]
+                                                               )
         end
         instances[options] = service
       end
